@@ -2,8 +2,11 @@
 
 import { SessionInterface } from '@/common.type';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import FormField from './FormField';
+import { categoryFilters } from '@/constants';
+import CustomMenu from './CustomMenu';
+import Button from './Button';
 
 export default function ProjectForm({
   type,
@@ -12,14 +15,56 @@ export default function ProjectForm({
   type: string;
   session: SessionInterface;
 }) {
-  const handleFormSubmit = (e: React.FormEvent) => {};
-  const handleChangeImage = (e: React.ChangeEvent) => {};
+  const [isSubmitting, setisSubmitting] = useState(false);
 
-  const handleStateChange = (fieldName: string, value: string) => {};
-
-  const form = {
-    image: '',
+  const [form, setForm] = useState({
     title: '',
+    description: '',
+    image: '',
+    liveSiteUrl: '',
+    githubUrl: '',
+    category: '',
+  });
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setisSubmitting(true);
+
+    try {
+      if (type === 'create') {
+        
+      }
+    }
+  };
+
+  const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.includes('image')) {
+      return alert('Please upload an image file');
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const result = reader.result as string;
+
+      handleStateChange('image', result);
+    };
+  };
+
+  const handleStateChange = (fieldName: string, value: string) => {
+    setForm((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
   };
 
   return (
@@ -54,29 +99,43 @@ export default function ProjectForm({
 
       <FormField
         title="Description"
-        state={form.Description}
+        state={form.description}
         placeholder="Showcase and discover remakable developer projects"
         setState={(value) => handleStateChange('description', value)}
       />
 
       <FormField
-        type='url'
+        type="url"
         title="Website URL"
-        state={form.liveSiteURL}
+        state={form.liveSiteUrl}
         placeholder="https://jsmastery.pro"
         setState={(value) => handleStateChange('liveSiteUrl', value)}
       />
 
       <FormField
-                type='url'
+        type="url"
         title="GitHub URL"
-        state={form.githubURL}
+        state={form.githubUrl}
         placeholder="https://github.com/MaDKnighT404"
-        setState={(value) => handleStateChange('githubURL', value)}
+        setState={(value) => handleStateChange('githubUrl', value)}
       />
-      {/* custom inputs*/}
-      <div className='flexStart w-full'>
-        <button>Create</button>
+      <CustomMenu
+        title="Category"
+        state={form.category}
+        filters={categoryFilters}
+        setState={(value) => handleStateChange('category', value)}
+      />
+      <div className="flexStart w-full">
+        <Button
+          title={
+            isSubmitting
+              ? `${type === 'create' ? 'Creating' : 'Editing'}`
+              : `${type === 'create' ? 'Create' : 'Edit'}`
+          }
+          type="submit"
+          isSubmitting={isSubmitting}
+          leftIcon={isSubmitting ? '' : '/plus.svg'}
+        />
       </div>
     </form>
   );

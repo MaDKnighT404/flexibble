@@ -1,12 +1,14 @@
 'use client';
 
-import { SessionInterface } from '@/common.type';
+import { SessionInterface } from '@/common.types';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import FormField from './FormField';
 import { categoryFilters } from '@/constants';
 import CustomMenu from './CustomMenu';
 import Button from './Button';
+import { createNewProject, fetchToken } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
 
 export default function ProjectForm({
   type,
@@ -15,7 +17,8 @@ export default function ProjectForm({
   type: string;
   session: SessionInterface;
 }) {
-  const [isSubmitting, setisSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const [form, setForm] = useState({
     title: '',
@@ -26,15 +29,23 @@ export default function ProjectForm({
     category: '',
   });
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setisSubmitting(true);
+    setIsSubmitting(true);
+
+    const { token } = await fetchToken();
 
     try {
       if (type === 'create') {
-        
+        await createNewProject(form, session?.user?.id, token);
+
+        router.push('/');
       }
+    } catch (error) {
+      alert(`Failed to ${type === 'create' ? 'create' : 'edit'} a project. Try again!`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

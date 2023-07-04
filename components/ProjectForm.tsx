@@ -50,8 +50,11 @@ export default function ProjectForm({
         router.push(`/edit-project/${project?.id}`);
       }
     } catch (error) {
+      console.log(form, project?.id as string, token);
+      console.log(project?.id)
+      console.log(token)
       console.log(error)
-      throw error;
+
       alert(`Failed to ${type === 'create' ? 'create' : 'edit'} a project. Try again!`);
     } finally {
       setIsSubmitting(false);

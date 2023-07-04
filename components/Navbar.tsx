@@ -14,7 +14,7 @@ async function Navbar() {
           <Image src="/logo.svg" width={116} height={43} alt="logo" />
         </Link>
         <ul className="xl:flex hidden text-small gap-7">
-          {NavLinks.map((link) => (
+        {NavLinks.map((link) => (
             <Link href={link.href} key={link.text}>
               {link.text}
             </Link>

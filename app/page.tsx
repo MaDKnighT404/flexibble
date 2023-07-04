@@ -31,7 +31,7 @@ export default async function Home() {
 
   return (
     <section className="flex-start flex-col paddings  mb-16">
-      <h2>Categories</h2>
+      <Categories></Categories>
 
       <section className="projects-grid">
         {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (

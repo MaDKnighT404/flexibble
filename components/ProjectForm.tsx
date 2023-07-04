@@ -1,32 +1,34 @@
 'use client';
 
-import { SessionInterface } from '@/common.types';
+import { ProjectInterface, SessionInterface } from '@/common.types';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import FormField from './FormField';
 import { categoryFilters } from '@/constants';
 import CustomMenu from './CustomMenu';
 import Button from './Button';
-import { createNewProject, fetchToken } from '@/lib/actions';
+import { createNewProject, fetchToken, updateProject } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 
 export default function ProjectForm({
   type,
   session,
+  project,
 }: {
   type: string;
   session: SessionInterface;
+  project?: ProjectInterface;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    image: '',
-    liveSiteUrl: '',
-    githubUrl: '',
-    category: '',
+    title: project?.title || '',
+    description: project?.description || '',
+    image: project?.image || '',
+    liveSiteUrl: project?.liveSiteUrl || '',
+    githubUrl: project?.githubUrl || '',
+    category: project?.category || '',
   });
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -41,6 +43,11 @@ export default function ProjectForm({
         await createNewProject(form, session?.user?.id, token);
 
         router.push('/');
+      }
+
+      if (type === 'edit') {
+        await updateProject(form, project?.id as string, token);
+        router.push(`/edit-project/${project?.id}`);
       }
     } catch (error) {
       alert(`Failed to ${type === 'create' ? 'create' : 'edit'} a project. Try again!`);

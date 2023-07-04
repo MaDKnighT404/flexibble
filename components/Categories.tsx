@@ -9,7 +9,7 @@ export default function Categories() {
   const searchParams = useSearchParams();
 
   const category = searchParams.get('category');
-  console.log(categoryFilters);
+
   const handleTags = (filter: string) => {
     router.push(`${pathName}?category=${filter}`);
   };

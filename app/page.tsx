@@ -1,8 +1,8 @@
 import { ProjectInterface } from '@/common.types';
 import Categories from '@/components/Categories';
+import LoadMore from '@/components/LoadMore';
 import ProjectCard from '@/components/ProjectCard';
 import { fetchAllProjects } from '@/lib/actions';
-import Image from 'next/image';
 
 type ProjectSearch = {
   projectSearch: {
@@ -16,12 +16,17 @@ type ProjectSearch = {
   };
 };
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+
 export default async function Home({
-  searchParams: { category },
+  searchParams: { category, endCursor },
 }: {
-  searchParams: { category?: string };
+  searchParams: { category?: string; endCursor?: string };
 }) {
-  const data = (await fetchAllProjects(category)) as ProjectSearch;
+  const data = (await fetchAllProjects(category, endCursor)) as ProjectSearch;
+  const pagination = data?.projectSearch?.pageInfo;
 
   const projectsToDisplay = data?.projectSearch?.edges || [];
 
@@ -51,7 +56,12 @@ export default async function Home({
           />
         ))}
       </section>
-      <h2>LoadMore</h2>
+      <LoadMore
+        startCursor={pagination.startCursor}
+        endCursor={pagination.endCursor}
+        hasPreviousPage={pagination.hasPreviousPage}
+        hasNextPage={pagination.hasNextPage}
+      />
     </section>
   );
 }

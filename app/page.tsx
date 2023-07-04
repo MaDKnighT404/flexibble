@@ -1,10 +1,51 @@
+import { ProjectInterface } from '@/common.types';
+import ProjectCard from '@/components/ProjectCard';
+import { fetchAllProjects } from '@/lib/actions';
 import Image from 'next/image';
 
-export default function Home() {
+type ProjectSearch = {
+  projectSearch: {
+    edges: { node: ProjectInterface }[];
+    pageInfo: {
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
+  };
+};
+
+export default async function Home() {
+  const data = (await fetchAllProjects()) as ProjectSearch;
+
+  const projectsToDisplay = data?.projectSearch?.edges || [];
+
+  if (projectsToDisplay.length === 0) {
+    return (
+      <section className="flexStart flex-col paddings">
+        Categories
+        <p className="no-result-text text-center">No projects found, go create some first.</p>
+      </section>
+    );
+  }
+
   return (
-    <section className='flex-start flex-col paddings  mb-16'>
+    <section className="flex-start flex-col paddings  mb-16">
       <h2>Categories</h2>
-      <h2>Posts</h2>
+
+      <section className="projects-grid">
+        {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (
+          <ProjectCard
+            key={node?.id}
+            id={node?.id}
+            image={node?.image}
+            title={node?.title}
+            name={node?.createdBy?.name}
+            avatarUrl={node?.createdBy?.avatarUrl}
+            userId={node?.createdBy?.id}
+          />
+        ))}
+      </section>
       <h2>LoadMore</h2>
     </section>
   );
